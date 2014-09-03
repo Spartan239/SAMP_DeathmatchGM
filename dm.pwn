@@ -14,18 +14,18 @@ enum g_ePlayer
 	p_aGuns[12] //This will be used to store weapons server-side so players can't hack weapons, however we won't completely set this up.
 }
 
-new g_aPlayers[MAX_PLAYERS][g_ePlayer]; //creates an array the size of MAX_PLAYERS containing info found in g_ePlayer enum
+new g_arrPlayers[MAX_PLAYERS][g_ePlayer]; //creates an array the size of MAX_PLAYERS containing info found in g_ePlayer enum
 new g_iClassCam[MAX_PLAYERS]; //an array that is used to hold a variable for each player, hence the size of MAX_PLAYERS
 
 //stock function to clear all player vairables
 stock FlushPlayerVars(playerid)
 {
-	g_aPlayers[playerid][p_iKills] = 0;
-	g_aPlayers[playerid][p_iDeaths] = 0;
+	g_arrPlayers[playerid][p_iKills] = 0;
+	g_arrPlayers[playerid][p_iDeaths] = 0;
 	g_iClassCam[playerid] = 0;
 	for(new i = 0; i < 12; i++)
 	{
-		g_aPlayers[playerid][p_aGuns][i] = 0;
+		g_arrPlayers[playerid][p_aGuns][i] = 0;
 	}
 }
 
@@ -117,17 +117,17 @@ public OnPlayerDisconnect(playerid)
 public OnPlayerDeath(playerid, killerid, reason)
 {
     SendDeathMessage(killerid, playerid, reason); //sends the message to the little death box on the right
-	g_aPlayers[playerid][p_iDeaths]++; //adds a death to the player
+	g_arrPlayers[playerid][p_iDeaths]++; //adds a death to the player
 	if(killerid != INVALID_PLAYER_ID) 
 	{
-		g_aPlayers[killerid][p_iKills]++; //checks if it is a player before adding a kill
-		SetPlayerScore(killerid, g_aPlayers[killerid][p_iKills]); //sets their scoreboard score to their kills
+		g_arrPlayers[killerid][p_iKills]++; //checks if it is a player before adding a kill
+		SetPlayerScore(killerid, g_arrPlayers[killerid][p_iKills]); //sets their scoreboard score to their kills
 		if(reason < 43) //if the reason is a players weapon (43 is a camera, 42 is the last 'weapon' that can kill people
 		{
 			if(reason != 19 && reason != 20 && reason != 21) //these aren't weapons and shouldnt be classified as so, we check that these weren't somehow called
 			{
 				new iSlot = GetWeaponSlot(reason); //gets the slot of the weapon the player killed with
-				SetPlayerArmedWeapon(killerid, g_aPlayers[killerid][p_aGuns][iSlot]); //sets their armed weapon to the weapon they killed with so we can get the correct weapons ammo
+				SetPlayerArmedWeapon(killerid, g_arrPlayers[killerid][p_aGuns][iSlot]); //sets their armed weapon to the weapon they killed with so we can get the correct weapons ammo
 				new iAmmo = GetPlayerAmmo(killerid); //get the ammo from the player (no option for specific slot, only player)
 		  		switch(iSlot)
 				{
@@ -152,12 +152,12 @@ public OnPlayerSpawn(playerid)
 	SetPlayerVirtualWorld(playerid, 0); //sets the VW to 0 so they can see other players
     g_iClassCam[playerid] = 0; //sets the class camera variable to 0 as they aren't selecting a class anymore
     ResetPlayerWeapons(playerid); //resets the players weapon
-	//This can be shortened to 'g_aPlayers[playerid][p_aGuns][GetWeaponSlot(24)] = 24;' however it isn't as readable
+	//This can be shortened to 'g_arrPlayers[playerid][p_aGuns][GetWeaponSlot(24)] = 24;' however it isn't as readable
 	new iSlot; //creates a new variable called iSlot
 	iSlot = GetWeaponSlot(24); //stores the weapon slot for a deagle
-	g_aPlayers[playerid][p_aGuns][iSlot] = 24; //tells the server the player has a deagle in the correct slot
+	g_arrPlayers[playerid][p_aGuns][iSlot] = 24; //tells the server the player has a deagle in the correct slot
 	iSlot = GetWeaponSlot(25); //stores the weapon slot for a shotgun
-	g_aPlayers[playerid][p_aGuns][iSlot] = 25; //tells the server the player has a shotgun in the correct lost
+	g_arrPlayers[playerid][p_aGuns][iSlot] = 25; //tells the server the player has a shotgun in the correct lost
 	GivePlayerWeapon(playerid, 24, 20); //deagle with 20 bullets
 	GivePlayerWeapon(playerid, 25, 50); //shotgun with 50 bullets
 	GameTextForPlayer(playerid, "~w~You have now~n~Spawned!", 5000, 1); //GameTextForPlayer with a 5000ms show timer, however type 1 is 8 seconds independant of specified time
@@ -190,9 +190,9 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		GetPlayerName(playerid, szPlayername, sizeof(szPlayername)); //sizeof function returns the size of the array, in this case 25 (MAX_PLAYER_NAME is 24 + 1 character for null or \0)
         format(szString, sizeof(szString), "Stats for player %s.", szPlayername); //formats the specified text into szString
         SendClientMessage(playerid, COLOR_WHITE, szString); //SendClientMessage sends a message to the specified player id, in this case the person who did the command
-        format(szString, sizeof(szString), "Kills: %d", g_aPlayers[playerid][p_iKills]); //formatting again replaces the old string with this text
+        format(szString, sizeof(szString), "Kills: %d", g_arrPlayers[playerid][p_iKills]); //formatting again replaces the old string with this text
         SendClientMessage(playerid, COLOR_WHITE, szString);
-        format(szString, sizeof(szString), "Deaths: %d", g_aPlayers[playerid][p_iDeaths]); //formatting again replaces the old string with this text
+        format(szString, sizeof(szString), "Deaths: %d", g_arrPlayers[playerid][p_iDeaths]); //formatting again replaces the old string with this text
         SendClientMessage(playerid, COLOR_WHITE, szString);
         return 1;
     }
